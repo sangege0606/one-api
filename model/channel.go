@@ -57,13 +57,15 @@ func GetAllChannels(startIdx int, num int, scope string) ([]*Channel, error) {
 	case "disabled":
 		err = DB.Order("id desc").Where("status = ? or status = ?", ChannelStatusAutoDisabled, ChannelStatusManuallyDisabled).Find(&channels).Error
 	default:
-		err = DB.Order("id desc").Limit(num).Offset(startIdx).Omit("key").Find(&channels).Error
+	    // sangege0606 取消对`key`的省略
+		err = DB.Order("id desc").Limit(num).Offset(startIdx)/* .Omit("key") */.Find(&channels).Error
 	}
 	return channels, err
 }
 
 func SearchChannels(keyword string) (channels []*Channel, err error) {
-	err = DB.Omit("key").Where("id = ? or name LIKE ?", helper.String2Int(keyword), keyword+"%").Find(&channels).Error
+    // sangege0606 取消对`key`的省略
+	err = DB/* .Omit("key") */.Where("id = ? or name LIKE ?", helper.String2Int(keyword), keyword+"%").Find(&channels).Error
 	return channels, err
 }
 
@@ -73,7 +75,8 @@ func GetChannelById(id int, selectAll bool) (*Channel, error) {
 	if selectAll {
 		err = DB.First(&channel, "id = ?", id).Error
 	} else {
-		err = DB.Omit("key").First(&channel, "id = ?", id).Error
+	    // sangege0606 取消对`key`的省略
+		err = DB/* .Omit("key") */.First(&channel, "id = ?", id).Error
 	}
 	return &channel, err
 }
